@@ -1,46 +1,241 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
-  <script language="javascript" src="libraries/p5.dom.js"></script>
-  <script language="javascript" src="libraries/p5.sound.js"></script>
-  <script language="javascript" src="libraries/Box2d.js"></script>
-
-  <script language="javascript" type="text/javascript" src="sketch.js"></script>
-  <script language="javascript" type="text/javascript" src="ConnectionGene.js"></script>
-  <script language="javascript" type="text/javascript" src="ConnectionHistory.js"></script>
-  <script language="javascript" type="text/javascript" src="Node.js"></script>
-  <script language="javascript" type="text/javascript" src="Player.js"></script>
-  <script language="javascript" type="text/javascript" src="Population.js"></script>
-  <script language="javascript" type="text/javascript" src="Species.js"></script>
-  <script language="javascript" type="text/javascript" src="Genome.js"></script>
-
-    <script language="javascript" type="text/javascript" src="Wheel.js"></script>
-    <script language="javascript" type="text/javascript" src="Car.js"></script>
-    <script language="javascript" type="text/javascript" src="Ground.js"></script>
-    <script language="javascript" type="text/javascript" src="Person.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nepali Racer</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+   <div id="loadingscreen">Loading...</div>
+   <!-- Preload main menu preview for vehicle, stage, and character -->
+   <div id="mainmenuPreview" style="display:none;">
+     <div class="menu-section">
+       <h2 style="font-size:1.2em;margin-bottom:8px;">Vehicle</h2>
+       <div id="mainmenuVehicle" style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px;cursor:pointer;">
+         <img src="Pics/car.png" alt="Car" id="mainVehicleImg" style="width:48px;height:28px;object-fit:contain;">
+         <span id="mainVehicleName">Car</span>
+         <button id="selectVehicle" style="padding:4px 12px;font-size:0.95em;">Change</button>
+       </div>
+     </div>
+     <div class="menu-section">
+       <h2 style="font-size:1.2em;margin-bottom:8px;">Stage</h2>
+       <div id="mainmenuStage" style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px;cursor:pointer;">
+         <img src="Pics/sky.png" alt="Sky" id="mainStageImg" style="width:60px;height:36px;object-fit:cover;border-radius:6px;">
+         <span id="mainStageName">Sky</span>
+         <button id="selectStage" style="padding:4px 12px;font-size:0.95em;">Change</button>
+       </div>
+     </div>
+     <div class="menu-section">
+       <h2 style="font-size:1.2em;margin-bottom:8px;">Character</h2>
+       <div id="mainmenuCharacter" style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px;cursor:pointer;">
+         <span id="mainCharacterName">Chhetri</span>
+         <button id="selectCharacter" style="padding:4px 12px;font-size:0.95em;">Change</button>
+       </div>
+     </div>
+   </div>
+   <canvas id="gamecanvas" width="800" height="400"></canvas>
+   <div id="mainmenu" style="display:none;">
+    <h1>Nepali Racer</h1>
+    <!-- Insert preview sections before Start Game -->
+    <div id="mainmenuPreviewContainer"></div>
+    <button id="startgame">Start Game</button>
+    <button id="exit">Exit</button>
+   </div>
+   <div id="gameover" style="display:none;">
+    <h1>Game Over</h1>
+    <p>Your Score: <span id="finalscore"></span></p>
+    <button id="restart">Restart</button>
+    <button id="mainmenuBtn">Main Menu</button>
+   </div>
+   <!-- Ethnic Group Selection Modal -->
+   <div id="ethnicModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
+     <div style="background:#fff;padding:32px 24px;border-radius:12px;max-width:400px;width:90%;margin:auto;text-align:center;">
+       <h2>Select Your Ethnic Group</h2>
+       <select id="ethnicSelect" style="width:100%;padding:8px;font-size:1.1em;">
+         <option value="">-- Choose Ethnic Group --</option>
+         <option>Chhetri</option>
+         <option>Bahun</option>
+         <option>Magar</option>
+         <option>Tharu</option>
+         <option>Tamang</option>
+         <option>Newar</option>
+         <option>Rai</option>
+         <option>Gurung</option>
+         <option>Limbu</option>
+         <option>Thakuri</option>
+         <!-- Add all 126 ethnic groups here -->
+       </select>
+       <button id="ethnicConfirm" style="margin-top:16px;padding:8px 24px;font-size:1.1em;">Confirm</button>
+       <button id="ethnicBack" style="margin-top:8px;padding:6px 18px;font-size:1em;">Back</button>
+     </div>
+   </div>
+   <!-- Vehicle Selection -->
+   <div id="vehicleSelect" style="display:none;text-align:center;margin:32px 0;">
+     <h2>Select Your Vehicle</h2>
+     <div id="vehicleList" style="display:flex;overflow-x:auto;gap:24px;justify-content:center;padding:16px 0;">
+       <div class="vehicle-card selected" data-vehicle="car">
+         <img src="Pics/car.png" alt="Car" style="width:80px;height:48px;object-fit:contain;">
+         <div>Car</div>
+       </div>
+       <div class="vehicle-card" data-vehicle="wheel">
+         <img src="Pics/wheel.png" alt="Wheel" style="width:80px;height:48px;object-fit:contain;">
+         <div>Wheel</div>
+       </div>
+     </div>
+     <button id="vehicleConfirm" style="margin-top:12px;padding:8px 24px;font-size:1.1em;">Select Vehicle</button>
+     <button id="vehicleBack" style="margin-top:8px;padding:6px 18px;font-size:1em;">Back</button>
+   </div>
+   <!-- Stage Selection -->
+   <div id="stageSelect" style="display:none;text-align:center;margin:32px 0;">
+     <h2>Select Stage</h2>
+     <div id="stageList" style="display:flex;overflow-x:auto;gap:24px;justify-content:center;padding:16px 0;">
+       <div class="stage-card selected" data-stage="sky">
+         <img src="Pics/sky.png" alt="Sky" style="width:100px;height:60px;object-fit:cover;border-radius:8px;">
+         <div>Sky</div>
+       </div>
+       <div class="stage-card" data-stage="grass">
+         <img src="Pics/grass.png" alt="Grass" style="width:100px;height:60px;object-fit:cover;border-radius:8px;">
+         <div>Grass</div>
+       </div>
+     </div>
+     <button id="stageConfirm" style="margin-top:12px;padding:8px 24px;font-size:1.1em;">Select Stage</button>
+     <button id="stageBack" style="margin-top:8px;padding:6px 18px;font-size:1em;">Back</button>
+   </div>
+   <script src="script.js"></script>
+   <script>
+window.onload = function() {
+  document.getElementById('loadingscreen').style.display = 'none';
+  // Only show ethnic group modal on first load, then show main menu after confirm
+  document.getElementById('mainmenu').style.display = 'none';
+  document.getElementById('vehicleSelect').style.display = 'none';
+  document.getElementById('stageSelect').style.display = 'none';
+  document.getElementById('ethnicModal').style.display = 'flex';
+};
 
-    <div id = "main">
-      <h2> Hill Climb Racing </h2>
-      <div id = "canvas">
-      </div>
-  </div>
+window.addEventListener('DOMContentLoaded', function() {
+  // Insert preview sections into main menu before showing
+  var preview = document.getElementById('mainmenuPreview').innerHTML;
+  document.getElementById('mainmenuPreviewContainer').innerHTML = preview;
 
-
-  <script>
-    //center the canvas
-    var tempString = ""+((window.innerWidth*0.9- 1026 - window.innerWidth*0.9*0.08 )/2)+ "px";
-    document.getElementById("main").style.marginLeft = tempString;
-
-
-    window.onresize = function(event) {
-      var tempString = ""+((window.innerWidth*0.9- 1026 - window.innerWidth*0.9*0.08 )/2)+ "px";
-      document.getElementById("main").style.marginLeft = tempString;
+  // Now that preview is injected, assign event listeners for clickable sections
+  if(document.getElementById('mainmenuVehicle'))
+    document.getElementById('mainmenuVehicle').onclick = function() {
+      document.getElementById('mainmenu').style.display = 'none';
+      document.getElementById('vehicleSelect').style.display = 'block';
+    };
+  if(document.getElementById('mainmenuStage'))
+    document.getElementById('mainmenuStage').onclick = function() {
+      document.getElementById('mainmenu').style.display = 'none';
+      document.getElementById('stageSelect').style.display = 'block';
+    };
+  if(document.getElementById('mainmenuCharacter'))
+    document.getElementById('mainmenuCharacter').onclick = function() {
+      document.getElementById('mainmenu').style.display = 'none';
+      document.getElementById('ethnicModal').style.display = 'flex';
     };
 
-  </script>
-
+  if(document.getElementById('ethnicConfirm'))
+    document.getElementById('ethnicConfirm').onclick = function() {
+      var val = document.getElementById('ethnicSelect').value;
+      if (!val) { alert('Please select your ethnic group!'); return; }
+      document.getElementById('ethnicModal').style.display = 'none';
+      document.getElementById('mainmenu').style.display = 'block';
+    };
+  // Vehicle selection
+  let selectedVehicle = 'car';
+  let vehicleData = {
+    car: { name: 'Car', img: 'Pics/car.png' },
+    wheel: { name: 'Wheel', img: 'Pics/wheel.png' }
+  };
+  document.querySelectorAll('.vehicle-card').forEach(card => {
+    card.onclick = function() {
+      document.querySelectorAll('.vehicle-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedVehicle = card.getAttribute('data-vehicle');
+    };
+  });
+  if(document.getElementById('vehicleConfirm'))
+    document.getElementById('vehicleConfirm').onclick = function() {
+      document.getElementById('vehicleSelect').style.display = 'none';
+      document.getElementById('mainmenu').style.display = 'block';
+      updateMainMenuVehicle(vehicleData[selectedVehicle].name, vehicleData[selectedVehicle].img);
+    };
+  if(document.getElementById('selectVehicle'))
+    document.getElementById('selectVehicle').onclick = function() {
+      document.getElementById('mainmenu').style.display = 'none';
+      document.getElementById('vehicleSelect').style.display = 'block';
+    };
+  // Stage selection
+  let selectedStage = 'sky';
+  let stageData = {
+    sky: { name: 'Sky', img: 'Pics/sky.png' },
+    grass: { name: 'Grass', img: 'Pics/grass.png' }
+  };
+  document.querySelectorAll('.stage-card').forEach(card => {
+    card.onclick = function() {
+      document.querySelectorAll('.stage-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedStage = card.getAttribute('data-stage');
+    };
+  });
+  if(document.getElementById('stageConfirm'))
+    document.getElementById('stageConfirm').onclick = function() {
+      document.getElementById('stageSelect').style.display = 'none';
+      document.getElementById('mainmenu').style.display = 'block';
+      updateMainMenuStage(stageData[selectedStage].name, stageData[selectedStage].img);
+    };
+  if(document.getElementById('selectStage'))
+    document.getElementById('selectStage').onclick = function() {
+      document.getElementById('mainmenu').style.display = 'none';
+      document.getElementById('stageSelect').style.display = 'block';
+    };
+  // Add back buttons to each selection screen
+  if(document.getElementById('ethnicBack'))
+    document.getElementById('ethnicBack').onclick = function() {
+      document.getElementById('ethnicModal').style.display = 'none';
+      document.getElementById('mainmenu').style.display = 'block';
+    };
+  if(document.getElementById('vehicleBack'))
+    document.getElementById('vehicleBack').onclick = function() {
+      document.getElementById('vehicleSelect').style.display = 'none';
+      document.getElementById('mainmenu').style.display = 'block';
+    };
+  if(document.getElementById('stageBack'))
+    document.getElementById('stageBack').onclick = function() {
+      document.getElementById('stageSelect').style.display = 'none';
+      document.getElementById('mainmenu').style.display = 'block';
+    };
+  if(document.getElementById('startgame'))
+    document.getElementById('startgame').onclick = function() {
+      document.getElementById('mainmenu').style.display = 'none';
+      // Optionally hide other overlays/modals here
+      // Call the canvas drawing logic
+      if (window.drawGameArea) {
+        window.drawGameArea();
+      } else {
+        // fallback: simple canvas fill if drawGameArea is not defined
+        const canvas = document.getElementById('gamecanvas');
+        if (canvas && canvas.getContext) {
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#4CAF50';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.font = '32px Arial';
+          ctx.fillStyle = '#fff';
+          ctx.fillText('Nepali Racer Game Area', 180, 200);
+        }
+      }
+    };
+});
+// Update main menu vehicle/stage preview on selection
+function updateMainMenuVehicle(name, img) {
+  document.getElementById('mainVehicleName').textContent = name;
+  document.getElementById('mainVehicleImg').src = img;
+}
+function updateMainMenuStage(name, img) {
+  document.getElementById('mainStageName').textContent = name;
+  document.getElementById('mainStageImg').src = img;
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,104 @@
+
+# PlayerData.gd
+# This script holds all game progress, like unlocked vehicles and stages.
+extends Node
+
+# --- DATA DICTIONARIES ---
+# We use the vehicle/stage name as a key for easy access.
+# true = unlocked, false = locked
+
+var unlocked_vehicles = {
+    "Rickshaw": true,
+    "Brawan_Jeep": true,
+    "Cycle": true,
+    "Hot_Rod": false,
+    "Tractor": false,
+    "Police_Van": false,
+    "Ambulance": false,
+    "School_Bus": false,
+    "Moonlander": false, # Bonus Locked
+    "Helicopter": false,
+    "Bike": false,
+    "Fire_Truck": false,
+    "Electric_Car": false,
+    "Tuk_Tuk": false,
+    "Bullock_Cart": false,
+    "Army_Truck": false,
+    "Drone_Rider": false,
+    "Solar_Car": false,
+    "Gravity_Bike": false,
+    "Magnet_Truck": false,
+    "Luxury_SUV": false,
+    "Transformer_Ride": false,
+    "AI_Car": false,
+    "Cargo_Truck": false,
+    "Van": false,
+    "Vintage_Car": false,
+    "Snowmobile": false,
+    "Jet_Car": false,
+    "Electric_Scooter": false,
+    "Horse_Cart": false,
+    "UFO_Car": false, # Hidden
+}
+
+var unlocked_stages = {
+    "Mahendra_Highway": true,
+    "Kathmandu_City": false,
+    "Lumbini": false,
+    "Pokhara": false,
+    "Rara_Lake": false,
+    "Nijgadh_Fast_Track": false,
+    "Mustang_Trail": false,
+    "Everest_Base_Camp": false,
+    "Terai_Flatland": false,
+    "Chitwan_National_Park": false,
+    "Moon": false, # Bonus Locked
+    "Mars_Surface": false,
+    "Cyber_Arena": false,
+    "Space_Highway": false,
+    "Glass_Skyroad": false,
+    "Gaindakot_Bridge": false,
+    "Boudhanath_Circuit": false,
+    "Pashupatinath_Round": false,
+    "Jungle_Trail": false,
+    "Flood_Survival": false,
+    "Earthquake_Ruins": false,
+    "Snowstorm_Drive": false,
+    "AI_Robot_War_Zone": false,
+    "Neon_City": false,
+    "Junkyard_Rush": false,
+    "Alien_Planet": false,
+    "Desert_Sandstorm": false,
+    "Thamel_Night_Drive": false,
+    "Bhaktapur_Durbar_Square": false,
+    "Fewa_Tal": false,
+    "Hidden_Tunnel": false, # Hidden
+}
+
+# --- FUNCTIONS ---
+
+## Check if a specific vehicle is unlocked
+func is_vehicle_unlocked(vehicle_id: String) -> bool:
+    return unlocked_vehicles.get(vehicle_id, false)
+
+## Check if a specific stage is unlocked
+func is_stage_unlocked(stage_id: String) -> bool:
+    return unlocked_stages.get(stage_id, false)
+
+## Unlock a vehicle by id
+func unlock_vehicle(vehicle_id: String):
+    if unlocked_vehicles.has(vehicle_id):
+        unlocked_vehicles[vehicle_id] = true
+        print("Vehicle Unlocked: ", vehicle_id)
+        # TODO: Add save_game() here in the future
+    else:
+        push_error("Tried to unlock non-existent vehicle '%s'" % vehicle_id)
+
+## Unlock a stage by id
+func unlock_stage(stage_id: String):
+    if unlocked_stages.has(stage_id):
+        unlocked_stages[stage_id] = true
+        print("Stage Unlocked: ", stage_id)
+        # TODO: Add save_game() here in the future
+    else:
+        push_error("Tried to unlock non-existent stage '%s'" % stage_id)

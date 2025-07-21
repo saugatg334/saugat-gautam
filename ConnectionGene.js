@@ -1,16 +1,14 @@
 //a connection between 2 nodes
-class connectionGene {
+class ConnectionGene {
   constructor(from, to, w, inno) {
     this.fromNode = from;
     this.toNode = to;
     this.weight = w;
     this.enabled = true;
     this.innovationNo = inno; //each connection is given a innovation number to compare genomes
-
   }
 
-  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  //changes the this.weight
+  // changes the this.weight
   mutateWeight() {
     var rand2 = random(1);
     if (rand2 < 0.1) { //10% of the time completely change the this.weight
@@ -23,17 +21,16 @@ class connectionGene {
       }
       if (this.weight < -1) {
         this.weight = -1;
-
       }
     }
   }
 
-  //----------------------------------------------------------------------------------------------------------
-  //returns a copy of this connectionGene
+  // returns a copy of this connectionGene
   clone(from, to) {
-    var clone = new connectionGene(from, to, this.weight, this.innovationNo);
+    var clone = new ConnectionGene(from, to, this.weight, this.innovationNo);
     clone.enabled = this.enabled;
-
     return clone;
   }
 }
+// If using modules, uncomment the following line:
+// export default ConnectionGene;

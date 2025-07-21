@@ -1,0 +1,291 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+body{
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.6;
+}
+header{
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+cursor: pointer;
+game-screen{
+hud{
+hud bar{
+music toggle{
+/* Fixed and improved selectors and properties */
+.menu-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  background: url('background.jpg') no-repeat center center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.menu-screen button:hover {
+  background-color: #45a049;
+}
+.selection-screen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  padding: 20px;
+  background-color: #333;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+.selection-screen * {
+  cursor: pointer;
+}
+}
+.vehicle-card:hover {
+  transform: scale(1.05);
+  background-color: #444;
+}
+.game-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to bottom, #4CAF50, #333);
+  overflow: hidden;
+}
+.vehicle {
+  position: absolute;
+  width: 50px;
+  height: 100px;
+  background-color: #4CAF50;
+  border-radius: 10px;
+  transition: transform 0.2s ease-in-out;
+}
+.terrain {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('terrain.jpg') repeat-x;
+  background-size: cover;
+  bottom: 0;
+}
+.controls {
+  position: fixed;
+  bottom: 20px;
+  width: 100px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.controls button {
+  width: 80px;
+  height: 80px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  backdrop-filter: blur(5px);
+}
+.hud {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hud-bar {
+  width: 200px;
+  height: 15px;
+  background-color: #444;
+  transition: width 0.3s ease-in-out;
+}
+.coin-counter {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 1.5rem;
+  color: yellow;
+}
+.music-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  color: white;
+}
+@media (max-width: 780px) {
+  .menu-screen button {
+    width: 80%;
+    font-size: 1rem;
+  }
+  .vehicle {
+    width: 70px;
+  }
+  .controls button {
+    width: 60px;
+    height: 60px;
+  }
+  .hud-bar {
+    width: 140px;
+  }
+}
+.glow-effect {
+  box-shadow: 0 0 200px #ffcc00, 0 0 20px #ffcc00, 0 0 20px #ffaa00;
+}
+.blink {
+  animation: blink 0.8s infinite alternate;
+}
+@keyframes blink {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
+}
+/* Loading screen styles */
+#loadingscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #222;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-size: 2em;
+    letter-spacing: 2px;
+    font-family: Arial, sans-serif;
+    animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+/* Stage and Vehicle Table Styles */
+.stages-table, .vehicles-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.stages-table th, .stages-table td, .vehicles-table th, .vehicles-table td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: left;
+}
+.stages-table th, .vehicles-table th {
+  background: #4CAF50;
+  color: #fff;
+}
+.stages-table tr:nth-child(even), .vehicles-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+.stages-table .unlocked, .vehicles-table .unlocked {
+  color: #388e3c;
+  font-weight: bold;
+}
+.stages-table .locked, .vehicles-table .locked {
+  color: #b71c1c;
+  font-weight: bold;
+}
+.stages-table .bonus, .vehicles-table .bonus {
+  color: #ff9800;
+  font-weight: bold;
+}
+#gamecanvas {
+  display: block;
+  margin: 32px auto 0 auto;
+  background: linear-gradient(to top, #b3e5fc 60%, #fff 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  border: 3px solid #1976d2;
+  max-width: 95vw;
+}
+#mainmenu {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  padding: 32px 24px;
+  max-width: 400px;
+  margin: 32px auto;
+  text-align: center;
+}
+#mainmenu button {
+  display: block;
+  width: 80%;
+  margin: 12px auto;
+  padding: 12px 0;
+  font-size: 1.2em;
+  border-radius: 8px;
+  border: none;
+  background: #1976d2;
+  color: #fff;
+  font-weight: bold;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+}
+#mainmenu button:hover {
+  background: #1565c0;
+}
+.vehicle-card.selected, .stage-card.selected {
+  border: 3px solid #1976d2;
+  box-shadow: 0 0 12px #1976d2;
+}
+.vehicle-card, .stage-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 8px 12px;
+  cursor: pointer;
+  min-width: 100px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.vehicle-card:hover, .stage-card:hover {
+  transform: scale(1.07);
+  box-shadow: 0 4px 16px #1976d2;
+}
+#vehicleList, #stageList {
+  scrollbar-width: thin;
+  scrollbar-color: #1976d2 #e3f2fd;
+}
+#vehicleList::-webkit-scrollbar, #stageList::-webkit-scrollbar {
+  height: 8px;
+  background: #e3f2fd;
+}
+#vehicleList::-webkit-scrollbar-thumb, #stageList::-webkit-scrollbar-thumb {
+  background: #1976d2;
+  border-radius: 8px;
+}
+#ethnicModal select {
+  border-radius: 8px;
+  border: 1px solid #1976d2;
+  background: #f5faff;
+}
+#ethnicModal button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+#ethnicModal button:hover {
+  background: #1565c0;
+}

@@ -2,23 +2,19 @@ class Ground {
 
   constructor(world) {
     this.world = world;
-
     this.id = "ground";
     this.vectors = [];
-    this.dirtBody;
-    this.grassBody;
-
+    this.dirtBody = undefined;
+    this.grassBody = undefined;
     this.distance = 15 * canvas.width;
     this.x = 0;
     this.y = 0;
     this.smoothness = 15; //a vector every
     this.grassThickness = 5;
     this.steepness = 250;
-
     this.grassPositions = [];
     this.steepnessLevel = 50 + difficulty; //from 0 to 200
     this.estimatedDIfficulty = 0;
-
   }
 
   randomizeGround() {
@@ -262,3 +258,5 @@ class Ground {
   }
 
 }
+// If using modules, uncomment the following line:
+// export default Ground;

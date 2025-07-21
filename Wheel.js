@@ -1,9 +1,9 @@
 class Wheel {
   constructor(x, y, r, chassisBody, world) {
+}
+// Export for use in other modules (ES6)
 
-    this.startingPosition = createVector(x, y);
-    this.radius = r;
-    this.body;
+export default Wheel;
     this.world = world;
     this.id = "wheel";
     this.onGround = false;
@@ -112,4 +112,7 @@ class Wheel {
 
 
 
+
+// Export for use in other modules (ES6)
+export default Wheel;
 }

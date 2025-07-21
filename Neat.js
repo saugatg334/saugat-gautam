@@ -1,38 +1,32 @@
-//this is a template to add a NEAT ai to any game
+// NEAT AI template for any game
 
 class Player {
-
   constructor(differentWorld) {
-
     this.fitness = 0;
-    this.vision = []; //the input array fed into the neuralNet
-    this.decision = []; //the out put of the NN
-    this.unadjustedFitness;
-    this.lifespan = 0; //how long the player lived for this.fitness
-    this.bestScore = 0; //stores the this.score achieved used for replay
+    this.vision = []; // the input array fed into the neuralNet
+    this.decision = []; // the output of the NN
+    this.unadjustedFitness = 0;
+    this.lifespan = 0; // how long the player lived for this.fitness
+    this.bestScore = 0; // stores the this.score achieved used for replay
     this.dead = false;
-    this.kindaDead = false; //this is true when the player has died but deadcount isn't up
+    this.kindaDead = false; // true when the player has died but deadcount isn't up
     this.score = 0;
     this.gen = 0;
     if (differentWorld) {
-      this.world = otherWorld;
+      this.world = typeof otherWorld !== 'undefined' ? otherWorld : null;
     } else {
-      this.world = getFreeWorld();
+      this.world = typeof getFreeWorld === 'function' ? getFreeWorld() : null;
     }
 
-
-    this.shirtColorR = floor(random(255));
-    this.shirtColorG = floor(random(255));
-    this.shirtColorB = floor(random(255));
-
-
+    this.shirtColorR = typeof floor === 'function' && typeof random === 'function' ? floor(random(255)) : 0;
+    this.shirtColorG = typeof floor === 'function' && typeof random === 'function' ? floor(random(255)) : 0;
+    this.shirtColorB = typeof floor === 'function' && typeof random === 'function' ? floor(random(255)) : 0;
 
     this.lastGrounded = 0;
-
     this.genomeInputs = 5;
     this.genomeOutputs = 2;
-    this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
-    this.car;
+    this.brain = typeof Genome === 'function' ? new Genome(this.genomeInputs, this.genomeOutputs) : null;
+    this.car = null;
     // this.world.SetContactListener(listener);
     //
     // this.ground = new Ground(this.world);
@@ -41,17 +35,17 @@ class Player {
     //
     // this.ground.setBodies(this.world);
     // timer = millis() - timer;
-    this.isCB = (floor(random(2)) == 0) ? true : false;
-
+    this.isCB = (typeof floor === 'function' && typeof random === 'function') ? (floor(random(2)) === 0) : false;
     this.deadCount = 50;
     this.motorState = 2;
-
   }
 
   addToWorld() {
-    this.car = new Car(350, spawningY, this.world, this);
-    this.car.setShirt();
-    this.car.person.head.isCB = this.isCB;
+    if (typeof Car === 'function') {
+      this.car = new Car(350, typeof spawningY !== 'undefined' ? spawningY : 0, this.world, this);
+      if (this.car.setShirt) this.car.setShirt();
+      if (this.car.person && this.car.person.head) this.car.person.head.isCB = this.isCB;
+    }
   }
 
 
@@ -69,90 +63,60 @@ class Player {
   move() {}
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   update() {
-      if (this.car.dead) {
-        this.kindaDead = true;
-      }
-      if (!this.kindaDead || this.deadCount > 0) {
-        // this.world.Step(1 / 30, 10, 10);
-        this.lifespan++;
-        this.car.update();
-      } else {
-        this.dead = true;
-      }
-
-      if (this.kindaDead) {
-        this.deadCount--;
-      }
-      this.score = max(1, floor((this.car.maxDistance - 349) / 10));
-      if (this.score > currentBestPlayer.score || currentBestPlayer.dead) {
-        currentBestPlayer = this;
-      }
-
-      if (this.dead) {
-        this.removePlayerFromWorld();
-      }
+    if (this.car && this.car.dead) {
+      this.kindaDead = true;
     }
+    if (!this.kindaDead || this.deadCount > 0) {
+      // this.world.Step(1 / 30, 10, 10);
+      this.lifespan++;
+      if (this.car && this.car.update) this.car.update();
+    } else {
+      this.dead = true;
+    }
+    if (this.kindaDead) {
+      this.deadCount--;
+    }
+    if (this.car && typeof max === 'function' && typeof floor === 'function') {
+      this.score = max(1, floor((this.car.maxDistance - 349) / 10));
+    }
+    if (typeof currentBestPlayer !== 'undefined' && (this.score > currentBestPlayer.score || currentBestPlayer.dead)) {
+      currentBestPlayer = this;
+    }
+    if (this.dead) {
+      this.removePlayerFromWorld();
+    }
+  }
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
   look() {
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+    // Game-specific vision logic
     this.vision = [];
+    if (!this.car || !this.car.chassisBody) return;
     this.vision[0] = this.car.chassisBody.GetAngle();
     while (this.vision[0] < 0) {
-      this.vision[0] += 2 * PI;
+      this.vision[0] += 2 * Math.PI;
     }
-    this.vision[0] = (this.vision[0] + PI) % (2 * PI);
-    this.vision[0] = map(this.vision[0], 0, 2 * PI, 0, 1);
+    this.vision[0] = (this.vision[0] + Math.PI) % (2 * Math.PI);
+    this.vision[0] = typeof map === 'function' ? map(this.vision[0], 0, 2 * Math.PI, 0, 1) : this.vision[0];
     this.lastGrounded++;
-    if (this.car.wheels[0].onGround || this.car.wheels[1].onGround) {
+    if (this.car.wheels && (this.car.wheels[0].onGround || this.car.wheels[1].onGround)) {
       this.vision[1] = 1;
       this.lastGrounded = 0;
     } else {
-      if (this.lastGrounded < 10) {
-        this.vision[1] = 1;
-      } else {
-        this.vision[1] = 0;
+      this.vision[1] = (this.lastGrounded < 10) ? 1 : 0;
+    }
+    if (this.car.chassisBody.GetAngularVelocity) {
+      this.vision.push(typeof map === 'function' ? map(this.car.chassisBody.GetAngularVelocity(), -4, 4, -1, 1) : this.car.chassisBody.GetAngularVelocity());
+    }
+    if (typeof groundTemplate !== 'undefined' && groundTemplate.getPositions && this.car.chassisBody.GetPosition) {
+      let temp = groundTemplate.getPositions(this.car.chassisBody.GetPosition().x, 2, 5);
+      let first = temp[0];
+      this.vision.push(typeof map === 'function' && typeof constrain === 'function' ? map(constrain(first - this.car.chassisBody.GetPosition().y - (this.car.chassisHeight || 0) / (typeof SCALE !== 'undefined' ? SCALE : 1), 0, 10), 0, 10, 0, 1) : 0);
+      for (let i = 1; i < temp.length; i++) {
+        temp[i] -= first;
+        this.vision.push(typeof map === 'function' ? map(temp[i], -3, 3, -1, 1) : temp[i]);
       }
-
     }
-    //
-    // this.vision[2] = map(this.car.chassisBody.GetLinearVelocity().x, -17, 17, -1, 1);
-    // this.vision[3] = map(this.car.chassisBody.GetLinearVelocity().y, -12, 12, -1, 1);
-    this.vision.push(map(this.car.chassisBody.GetAngularVelocity(), -4, 4, -1, 1));
-
-    // this.vision[3] = this.car.chassisBody.GetLinearVelocity().y;
-    // this.vision[4] = this.car.chassisBody.GetAngularVelocity();
-    //
-    //
-    //
-
-
-    let temp = (groundTemplate.getPositions(this.car.chassisBody.GetPosition().x, 2, 5));
-    let first = temp[0];
-    this.vision.push(map(constrain(first - this.car.chassisBody.GetPosition().y - this.car.chassisHeight / SCALE, 0, 10), 0, 10, 0, 1));
-
-    for (var i = 1; i < temp.length; i++) {
-      temp[i] -= first;
-      temp[i] = map(temp[i], -3, 3, -1, 1);
-      this.vision.push(temp[i]);
-    }
-
-    //
-    // let oi = groundTemplate.getPositions(this.car.chassisBody.GetPosition().x, 10, 1);
-    //
-    // var totalDifference = 0;
-    // for (var i = 1; i < oi.length; i++) {
-    //   totalDifference += max(0, oi[i - 1] - oi[i]);
-    // }
-    //
-    // if (frameCount % 100 == 0) {
-    //   console.log(totalDifference);
-    // }
-    // groundTemplate.showPoints(this.car.chassisBody.GetPosition().x, 10, 1);
-
-    // createDiv(this.vision[0]);
-
-
   }
 
 
@@ -160,72 +124,55 @@ class Player {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //gets the output of the this.brain then converts them to actions
   think() {
-
-      var max = 0;
-      var maxIndex = 0;
-      //get the output of the neural network
-      this.decision = this.brain.feedForward(this.vision);
-
-      for (var i = 0; i < this.decision.length; i++) {
-        if (this.decision[i] > max) {
-          max = this.decision[i];
-          maxIndex = i;
-        }
+    if (!this.brain || !this.vision) return;
+    let max = 0;
+    let maxIndex = 0;
+    // get the output of the neural network
+    this.decision = this.brain.feedForward(this.vision);
+    for (let i = 0; i < this.decision.length; i++) {
+      if (this.decision[i] > max) {
+        max = this.decision[i];
+        maxIndex = i;
       }
-      if (max < 0.6) {
-        if (this.motorState == 2) {
-          return;
-        }
-
-        this.car.motorOff();
-        this.motorState = 2;
-        return;
-      }
-
-      switch (maxIndex) {
-        case 0:
-          if (this.motorState == 0) {
-            return;
-          }
-          this.car.motorOn(true);
-          this.motorState = 0;
-          break;
-        case 1:
-          if (this.motorState == 1) {
-            return;
-          }
-          this.car.motorOn(false);
-          this.motorState = 1;
-          break;
-          // case 2:
-          //   if (this.motorState == 2) {
-          //     return;
-          //   }
-          //
-          //   this.car.motorOff();
-          //   this.motorState = 2;
-          //   break;
-      }
-
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-
-
     }
+    if (max < 0.6) {
+      if (this.motorState === 2) return;
+      if (this.car && this.car.motorOff) this.car.motorOff();
+      this.motorState = 2;
+      return;
+    }
+    switch (maxIndex) {
+      case 0:
+        if (this.motorState === 0) return;
+        if (this.car && this.car.motorOn) this.car.motorOn(true);
+        this.motorState = 0;
+        break;
+      case 1:
+        if (this.motorState === 1) return;
+        if (this.car && this.car.motorOn) this.car.motorOn(false);
+        this.motorState = 1;
+        break;
+    }
+  }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
     //returns a clone of this player with the same brian
   clone() {
-    var clone = new Player();
-    clone.brain = this.brain.clone();
+    let clone = new Player();
+    if (this.brain && this.brain.clone) clone.brain = this.brain.clone();
     clone.fitness = this.fitness;
-    clone.brain.generateNetwork();
+    if (clone.brain && clone.brain.generateNetwork) clone.brain.generateNetwork();
     clone.gen = this.gen;
     clone.bestScore = this.score;
-    clone.shirtColorR = this.shirtColorR + random(-2, 2);
-    clone.shirtColorG = this.shirtColorG + random(-2, 2);
-    clone.shirtColorB = this.shirtColorB + random(-2, 2);
+    if (typeof random === 'function') {
+      clone.shirtColorR = this.shirtColorR + random(-2, 2);
+      clone.shirtColorG = this.shirtColorG + random(-2, 2);
+      clone.shirtColorB = this.shirtColorB + random(-2, 2);
+    } else {
+      clone.shirtColorR = this.shirtColorR;
+      clone.shirtColorG = this.shirtColorG;
+      clone.shirtColorB = this.shirtColorB;
+    }
     clone.addToWorld();
-
-
     return clone;
   }
 
@@ -234,22 +181,19 @@ class Player {
   //this fuction does that
 
   cloneForReplay() {
-    var clone = new Player(true);
+    let clone = new Player(true);
     if (!this.dead && this.car != null) {
       this.removePlayerFromWorld();
     }
-    clone.brain = this.brain.clone();
+    if (this.brain && this.brain.clone) clone.brain = this.brain.clone();
     clone.fitness = this.fitness;
-    clone.brain.generateNetwork();
+    if (clone.brain && clone.brain.generateNetwork) clone.brain.generateNetwork();
     clone.gen = this.gen;
     clone.bestScore = this.score;
     clone.shirtColorR = this.shirtColorR;
     clone.shirtColorG = this.shirtColorG;
     clone.shirtColorB = this.shirtColorB;
     clone.isCB = this.isCB;
-
-
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
     return clone;
   }
 
@@ -259,26 +203,27 @@ class Player {
     this.fitness = this.score;
     // this.score = this.fitness;
     this.fitness *= this.fitness;
-    this.fitness *= map(this.score / this.lifespan, 0, 1, 0.9, 1);
-
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+    if (typeof map === 'function') {
+      this.fitness *= map(this.score / (this.lifespan || 1), 0, 1, 0.9, 1);
+    }
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   crossover(parent2) {
-
-    var child = new Player();
-    child.brain = this.brain.crossover(parent2.brain);
-    child.brain.generateNetwork();
-    child.shirtColorR = this.shirtColorR + random(-10, 10);
-    child.shirtColorG = this.shirtColorG + random(-10, 10);
-    child.shirtColorB = this.shirtColorB + random(-10, 10);
-    // child.shirtColorR = constrain((1.5 * this.shirtColorR + 0.5 * parent2.shortColorR) / 2 + random(-2, 2), 0, 255);
-    // child.shirtColorG = constrain((1.5 * this.shirtColorG + 0.5 * parent2.shortColorG) / 2 + random(-2, 2), 0, 255);
-    // child.shirtColorB = constrain((1.5 * this.shirtColorB + 0.5 * parent2.shortColorB) / 2 + random(-2, 2), 0, 255);
+    let child = new Player();
+    if (this.brain && this.brain.crossover && parent2.brain) child.brain = this.brain.crossover(parent2.brain);
+    if (child.brain && child.brain.generateNetwork) child.brain.generateNetwork();
+    if (typeof random === 'function') {
+      child.shirtColorR = this.shirtColorR + random(-10, 10);
+      child.shirtColorG = this.shirtColorG + random(-10, 10);
+      child.shirtColorB = this.shirtColorB + random(-10, 10);
+    } else {
+      child.shirtColorR = this.shirtColorR;
+      child.shirtColorG = this.shirtColorG;
+      child.shirtColorB = this.shirtColorB;
+    }
     child.addToWorld();
-    // child.car.setShirt();
-    if (random(1) < 0.99) {
+    if (typeof random === 'function' && random(1) < 0.99) {
       child.isCB = this.isCB;
     } else {
       child.isCB = !this.isCB;
@@ -287,27 +232,36 @@ class Player {
   }
 
   removePlayerFromWorld() {
-    this.world.DestroyBody(this.car.chassisBody);
-    this.world.DestroyBody(this.car.wheels[0].body);
-    this.world.DestroyBody(this.car.wheels[0].rimBody);
-    this.world.DestroyBody(this.car.wheels[1].body);
-    this.world.DestroyBody(this.car.wheels[1].rimBody);
-    this.world.DestroyBody(this.car.person.head.body);
-    this.world.DestroyBody(this.car.person.torso.body);
+    if (!this.world || !this.car) return;
+    if (this.car.chassisBody) this.world.DestroyBody(this.car.chassisBody);
+    if (this.car.wheels && this.car.wheels[0]) {
+      if (this.car.wheels[0].body) this.world.DestroyBody(this.car.wheels[0].body);
+      if (this.car.wheels[0].rimBody) this.world.DestroyBody(this.car.wheels[0].rimBody);
+    }
+    if (this.car.wheels && this.car.wheels[1]) {
+      if (this.car.wheels[1].body) this.world.DestroyBody(this.car.wheels[1].body);
+      if (this.car.wheels[1].rimBody) this.world.DestroyBody(this.car.wheels[1].rimBody);
+    }
+    if (this.car.person && this.car.person.head && this.car.person.head.body) this.world.DestroyBody(this.car.person.head.body);
+    if (this.car.person && this.car.person.torso && this.car.person.torso.body) this.world.DestroyBody(this.car.person.torso.body);
   }
   resetCar() {
-    this.world.DestroyBody(this.car.chassisBody);
-    this.world.DestroyBody(this.car.wheels[0].body);
-    this.world.DestroyBody(this.car.wheels[0].rimBody);
-    this.world.DestroyBody(this.car.wheels[1].body);
-    this.world.DestroyBody(this.car.wheels[1].rimBody);
-    this.world.DestroyBody(this.car.person.head.body);
-    this.world.DestroyBody(this.car.person.torso.body);
-
-    this.car = new Car(150, 0, this.world, this);
-    reset = false;
-    resetCounter = 120;
-    panX = 0;
+    if (!this.world || !this.car) return;
+    if (this.car.chassisBody) this.world.DestroyBody(this.car.chassisBody);
+    if (this.car.wheels && this.car.wheels[0]) {
+      if (this.car.wheels[0].body) this.world.DestroyBody(this.car.wheels[0].body);
+      if (this.car.wheels[0].rimBody) this.world.DestroyBody(this.car.wheels[0].rimBody);
+    }
+    if (this.car.wheels && this.car.wheels[1]) {
+      if (this.car.wheels[1].body) this.world.DestroyBody(this.car.wheels[1].body);
+      if (this.car.wheels[1].rimBody) this.world.DestroyBody(this.car.wheels[1].rimBody);
+    }
+    if (this.car.person && this.car.person.head && this.car.person.head.body) this.world.DestroyBody(this.car.person.head.body);
+    if (this.car.person && this.car.person.torso && this.car.person.torso.body) this.world.DestroyBody(this.car.person.torso.body);
+    this.car = typeof Car === 'function' ? new Car(150, 0, this.world, this) : null;
+    if (typeof reset !== 'undefined') reset = false;
+    if (typeof resetCounter !== 'undefined') resetCounter = 120;
+    if (typeof panX !== 'undefined') panX = 0;
   }
 
 }
@@ -827,8 +781,7 @@ class Species {
   }
 }
 
-//note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-//this means that there is some information specific to the game to input here
+// Note: This file is a template for NEAT AI integration. Game-specific logic may be required.
 var Vec2 = Box2D.Common.Math.b2Vec2;
 var b2BodyDef = Box2D.Dynamics.b2BodyDef;
 var b2Body = Box2D.Dynamics.b2Body;

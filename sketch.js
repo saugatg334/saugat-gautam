@@ -1,180 +1,193 @@
-//this is a template to add a NEAT ai to any game
-//note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-//this means that there is some information specific to the game to input here
-var Vec2 = Box2D.Common.Math.b2Vec2;
-var b2BodyDef = Box2D.Dynamics.b2BodyDef;
-var b2Body = Box2D.Dynamics.b2Body;
-var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
-var b2Fixture = Box2D.Dynamics.b2Fixture;
-var b2World = Box2D.Dynamics.b2World;
-var b2MassData = Box2D.Collision.Shapes.b2MassData;
-var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
-var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
-var b2EdgeChainDef = Box2D.Collision.Shapes.b2EdgeChainDef;
+import Population from './Population.js';
 
-var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
-var b2StaticBody = Box2D.Dynamics.b2Body.b2_staticBody;
-var b2DynamicBody = Box2D.Dynamics.b2Body.b2_dynamicBody;
-var b2RevoluteJoint = Box2D.Dynamics.Joints.b2RevoluteJoint;
-var b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
+const Vec2 = Box2D.Common.Math.b2Vec2;
+const b2BodyDef = Box2D.Dynamics.b2BodyDef;
+const b2Body = Box2D.Dynamics.b2Body;
+const b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
+const b2Fixture = Box2D.Dynamics.b2Fixture;
+const b2World = Box2D.Dynamics.b2World;
+const b2MassData = Box2D.Collision.Shapes.b2MassData;
+const b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+const b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+const b2EdgeChainDef = Box2D.Collision.Shapes.b2EdgeChainDef;
 
-var b2PrismaticJoint = Box2D.Dynamics.Joints.b2PrismaticJoint;
+const b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+const b2StaticBody = Box2D.Dynamics.b2Body.b2_staticBody;
+const b2DynamicBody = Box2D.Dynamics.b2Body.b2_dynamicBody;
+const b2RevoluteJoint = Box2D.Dynamics.Joints.b2RevoluteJoint;
+const b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
 
-var b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef;
+const b2PrismaticJoint = Box2D.Dynamics.Joints.b2PrismaticJoint;
 
-var b2FilterData = Box2D.Dynamics.b2FilterData;
+const b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef;
 
-var b2DistanceJoint = Box2D.Dynamics.Joints.b2DistanceJoint;
-var b2DistanceJointDef = Box2D.Dynamics.Joints.b2DistanceJointDef;
+const b2FilterData = Box2D.Dynamics.b2FilterData;
 
-var b2WeldJoint = Box2D.Dynamics.Joints.b2WeldJoint;
-var b2WeldJointDef = Box2D.Dynamics.Joints.b2WeldJointDef;
+const b2DistanceJoint = Box2D.Dynamics.Joints.b2DistanceJoint;
+const b2DistanceJointDef = Box2D.Dynamics.Joints.b2DistanceJointDef;
+
+const b2WeldJoint = Box2D.Dynamics.Joints.b2WeldJoint;
+const b2WeldJointDef = Box2D.Dynamics.Joints.b2WeldJointDef;
 
 //------------------------------------------GLOBALS
-var SCALE = 30;
-var groundBody;
-var wheels = [];
-var groundTemplate;
+const SCALE = 30;
+let groundBody;
+let wheels = [];
+let groundTemplate;
 
-var pause = false;
+let pause = false;
 
-var panX = 0;
-var targetPanX = 0;
-var maxPanSpeed = 100;
-var panSpeed = 50;
-var panAcc = 10;
-var panY = 0;
+let panX = 0;
+let targetPanX = 0;
+let maxPanSpeed = 100;
+let panSpeed = 50;
+let panAcc = 10;
+let panY = 0;
 
-var leftDown = false;
-var rightDown = false;
-var listener = new Box2D.Dynamics.b2ContactListener;
-// var listener2 = new Box2D.Dynamics.b2ContactListener;
+let leftDown = false;
+let rightDown = false;
+const listener = new Box2D.Dynamics.b2ContactListener();
+// let listener2 = new Box2D.Dynamics.b2ContactListener();
 
-var carSprite;
-var headSprite;
-var cbHead = false;
-var wheelSprite;
-var shownGround = false;
+let carSprite;
+let headSprite;
+let cbHead = false;
+let wheelSprite;
+let shownGround = false;
 
-var spawningY = 0;
+let spawningY = 0;
 
 //collisionCatagories i.e what it is
 
 
-var WHEEL_CATEGORY = 0x0001;
-var CHASSIS_CATEGORY = 0X0002;
-var GRASS_CATEGORY = 0X0004;
-var DIRT_CATEGORY = 0x0008;
-var PERSON_CATEGORY = 0x0010;
+const WHEEL_CATEGORY = 0x0001;
+const CHASSIS_CATEGORY = 0x0002;
+const GRASS_CATEGORY = 0x0004;
+const DIRT_CATEGORY = 0x0008;
+const PERSON_CATEGORY = 0x0010;
 
 //collision Masks ie. what it collides with
-var WHEEL_MASK = (GRASS_CATEGORY);
-var CHASSIS_MASK = (DIRT_CATEGORY);
-var GRASS_MASK = (WHEEL_CATEGORY | PERSON_CATEGORY);
-var DIRT_MASK = (CHASSIS_CATEGORY);
-var PERSON_MASK = (GRASS_CATEGORY);
+const WHEEL_MASK = (GRASS_CATEGORY);
+const CHASSIS_MASK = (DIRT_CATEGORY);
+const GRASS_MASK = (WHEEL_CATEGORY | PERSON_CATEGORY);
+const DIRT_MASK = (CHASSIS_CATEGORY);
+const PERSON_MASK = (GRASS_CATEGORY);
 
-var resetCounter = 120;
-var reset = false;
+let resetCounter = 120;
+let reset = false;
 
-var p;
-var p2;
-var nextPanX = 0;
-
-
-var nextConnectionNo = 1000;
-var population;
-var speed = 60;
+let p;
+let p2;
+let nextPanX = 0;
 
 
-var showBest = false; //true if only show the best of the previous generation
-var runBest = false; //true if replaying the best ever game
-var humanPlaying = false; //true if the user is playing
-
-var fightMode = false; //true when the player is fighting the best every player
-var humanPlayer;
+let nextConnectionNo = 1000;
+let population;
+let speed = 60;
 
 
-var showBrain = false;
+let showBest = false; //true if only show the best of the previous generation
+let runBest = false; //true if replaying the best ever game
+let humanPlaying = false; //true if the user is playing
 
-var showBestEachGen = false;
-var upToGen = 0;
-var genPlayerTemp; //player
+let fightMode = false; //true when the player is fighting the best every player
+let humanPlayer;
 
-var showNothing = false;
 
-var currentBestPlayer;
-var spawnHeight = 0;
+let showBrain = false;
+
+let showBestEachGen = false;
+let upToGen = 0;
+let genPlayerTemp; //player
+
+let showNothing = false;
+
+let currentBestPlayer;
+let spawnHeight = 0;
 //--------------
 
-var playersInEachWorld = [];
+let playersInEachWorld = [];
 
 
-var grassSprites = [];
+let grassSprites = [];
 
-// var ground;
-// var world;
+// let ground;
+// let world;
 
-var otherWorld; // for human, gen replay, species, best
-var worlds = [];
-var grounds = [];
-var numberOfWorlds = 50;
-var playersPerWorld = 15;
+let otherWorld; // for human, gen replay, species, best
+let worlds = [];
+let grounds = [];
+let numberOfWorlds = 50;
+let playersPerWorld = 15;
 
 
-var skySprite;
-var darknessSprite;
-var difficulty = 50;
+let skySprite;
+let darknessSprite;
+let difficulty = 50;
 
 listener.BeginContact = function(contact) {
   let world = contact.GetFixtureA().GetBody().GetWorld();
   if (reset) {
     return;
   }
-  if (contact.GetFixtureA().GetBody().GetUserData().id == "head") {
-    if (contact.GetFixtureB().GetBody().GetUserData().id == "ground") {
+  let userDataA = contact.GetFixtureA().GetBody().GetUserData();
+  let userDataB = contact.GetFixtureB().GetBody().GetUserData();
 
-      if (contact.GetFixtureA().GetBody().GetJointList() == null) {
-        return;
+  if (userDataA && userDataB) {
+    if (userDataA.id == "head") {
+      if (userDataB.id == "ground") {
+
+        if (contact.GetFixtureA().GetBody().GetJointList() == null) {
+          return;
+        }
+        let car = contact.GetFixtureA().GetBody().GetJointList().other.GetJointList().other.GetUserData(); //i think that is the grossest code i have ever written
+        if (car) {
+          world.DestroyJoint(car.distJoint);
+          world.DestroyJoint(car.person.distJoint);
+          world.DestroyJoint(car.revJoint);
+          world.DestroyJoint(car.person.headJoint);
+          car.player.kindaDead = true;
+        }
       }
-      let car = contact.GetFixtureA().GetBody().GetJointList().other.GetJointList().other.GetUserData(); //i think that is the grossest code i have ever written
-
-      world.DestroyJoint(car.distJoint);
-      world.DestroyJoint(car.person.distJoint);
-      world.DestroyJoint(car.revJoint);
-      world.DestroyJoint(car.person.headJoint);
-      car.player.kindaDead = true;
     }
-  }
 
-  if (contact.GetFixtureB().GetBody().GetUserData().id == "head") {
-    if (contact.GetFixtureA().GetBody().GetUserData().id == "ground") {
+    if (userDataB.id == "head") {
+      if (userDataA.id == "ground") {
 
-      if (contact.GetFixtureB().GetBody().GetJointList() == null) {
-        return;
+        if (contact.GetFixtureB().GetBody().GetJointList() == null) {
+          return;
+        }
+        let car = contact.GetFixtureB().GetBody().GetJointList().other.GetJointList().other.GetUserData(); //i think that is the grossest code i have ever written
+        if (car) {
+          world.DestroyJoint(car.distJoint);
+          world.DestroyJoint(car.person.distJoint);
+          world.DestroyJoint(car.revJoint);
+          world.DestroyJoint(car.person.headJoint);
+          car.player.kindaDead = true;
+        }
       }
-      let car = contact.GetFixtureB().GetBody().GetJointList().other.GetJointList().other.GetUserData(); //i think that is the grossest code i have ever written
-      world.DestroyJoint(car.distJoint);
-      world.DestroyJoint(car.person.distJoint);
-      world.DestroyJoint(car.revJoint);
-      world.DestroyJoint(car.person.headJoint);
-      car.player.kindaDead = true;
     }
-  }
 
-  if (contact.GetFixtureA().GetBody().GetUserData().id == "wheel") {
-    if (contact.GetFixtureB().GetBody().GetUserData().id == "ground") {
-      createDiv("oi fuck");
+    if (userDataA.id == "wheel") {
+      if (userDataB.id == "ground") {
+        createDiv("oi fuck");
 
-      contact.GetFixtureA().GetBody().GetUserData().onGround = true;
+        let userDataA = contact.GetFixtureA().GetBody().GetUserData();
+        if (userDataA) {
+          userDataA.onGround = true;
+        }
+      }
     }
-  }
 
-  if (contact.GetFixtureB().GetBody().GetUserData().id == "wheel") {
-    if (contact.GetFixtureA().GetBody().GetUserData().id == "ground") {
+    if (userDataB.id == "wheel") {
+      if (userDataA.id == "ground") {
 
-      contact.GetFixtureB().GetBody().GetUserData().onGround = true;
+        let userDataB = contact.GetFixtureB().GetBody().GetUserData();
+        if (userDataB) {
+          userDataB.onGround = true;
+        }
 
+      }
     }
   }
 }
@@ -185,46 +198,54 @@ listener.BeginContact = function(contact) {
 //
 // }
 listener.EndContact = function(contact) {
+  let userDataA = contact.GetFixtureA().GetBody().GetUserData();
+  let userDataB = contact.GetFixtureB().GetBody().GetUserData();
 
-  if (contact.GetFixtureA().GetBody().GetUserData().id == "wheel") {
-    if (contact.GetFixtureB().GetBody().GetUserData().id == "ground") {
-
-      contact.GetFixtureA().GetBody().GetUserData().onGround = false;
+  if (userDataA && userDataB) {
+    if (userDataA.id == "wheel") {
+      if (userDataB.id == "ground") {
+        userDataA.onGround = false;
+      }
     }
-  }
 
-  if (contact.GetFixtureB().GetBody().GetUserData().id == "wheel") {
-    if (contact.GetFixtureA().GetBody().GetUserData().id == "ground") {
-
-      contact.GetFixtureB().GetBody().GetUserData().onGround = false;
-
+    if (userDataB.id == "wheel") {
+      if (userDataA.id == "ground") {
+        userDataB.onGround = false;
+      }
     }
   }
 }
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
-function preload() {
-  CBHeadSprite = loadImage("Pics/CBHead3.png");
-  headSprite = loadImage("Pics/headLarge.png");
-  skySprite = loadImage("Pics/sky.png");
-  darknessSprite = loadImage("Pics/darkness.png");
+function loadImageWithFallback(path, fallbackPath) {
+  return new Promise((resolve) => {
+    let img = loadImage(path, 
+      () => resolve(img), 
+      () => resolve(loadImage(fallbackPath))
+    );
+  });
+}
 
-  carSprite = loadImage("Pics/car.png");
-  wheelSprite = loadImage("Pics/wheel2.png");
-  grassSprites.push(loadImage("Pics/grass.png"));
-  grassSprites.push(loadImage("Pics/grass2.png"));
-  grassSprites.push(loadImage("Pics/grass3.png"));
-  grassSprites.push(loadImage("Pics/grass4.png"));
-  grassSprites.push(loadImage("Pics/grass5.png"));
-  grassSprites.push(loadImage("Pics/grass5.png"));
+async function preload() {
+  CBHeadSprite = await loadImageWithFallback("Pics/CBHead3.png", "Pics/placeholder_jeep.svg");
+  headSprite = await loadImageWithFallback("Pics/headLarge.png", "Pics/placeholder_jeep.svg");
+  skySprite = await loadImageWithFallback("Pics/sky.png", "Pics/placeholder_jeep.svg");
+  darknessSprite = await loadImageWithFallback("Pics/darkness.png", "Pics/placeholder_jeep.svg");
 
-
+  carSprite = await loadImageWithFallback("Pics/car.png", "Pics/placeholder_jeep.svg");
+  wheelSprite = await loadImageWithFallback("Pics/wheel2.png", "Pics/placeholder_jeep.svg");
+  grassSprites.push(await loadImageWithFallback("Pics/grass.png", "Pics/placeholder_jeep.svg"));
+  grassSprites.push(await loadImageWithFallback("Pics/grass2.png", "Pics/placeholder_jeep.svg"));
+  grassSprites.push(await loadImageWithFallback("Pics/grass3.png", "Pics/placeholder_jeep.svg"));
+  grassSprites.push(await loadImageWithFallback("Pics/grass4.png", "Pics/placeholder_jeep.svg"));
+  grassSprites.push(await loadImageWithFallback("Pics/grass5.png", "Pics/placeholder_jeep.svg"));
+  grassSprites.push(await loadImageWithFallback("Pics/grass5.png", "Pics/placeholder_jeep.svg"));
 }
 
 function setup() {
   window.canvas = createCanvas(1280, 720);
-  canvas.parent("canvas");
+  canvas.parent("game-container");
   frameRate(30); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<FRAME RATE
 
 
@@ -387,9 +408,12 @@ function draw() {
 //draws the display screen
 function drawToScreen() {
   if (!showNothing) {
-    // background(120, 200, 255);
+    // Clear background with sky image
+    background(120, 200, 255);
     image(skySprite, 0, 0);
 
+    // Draw HUD overlay for vehicle, stage, fuel, coin, diamond
+    drawHUD();
 
     //pretty stuff
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
@@ -397,6 +421,44 @@ function drawToScreen() {
     drawBrain();
     writeInfo();
   }
+}
+
+function drawHUD() {
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  textSize(20);
+  textAlign(LEFT, TOP);
+
+  // Example positions
+  let x = 20;
+  let y = 20;
+  let spacing = 30;
+
+  // Draw background box for HUD
+  fill(0, 150);
+  noStroke();
+  rect(x - 10, y - 10, 220, spacing * 5 + 20, 10);
+
+  // Draw text with stroke for readability
+  stroke(0);
+  strokeWeight(2);
+  fill(255);
+
+  // Vehicle info
+  text("Vehicle: " + (selectedVehicle || "Unknown"), x, y);
+
+  // Stage info
+  text("Stage: " + (selectedStage || "Unknown"), x, y + spacing);
+
+  // Fuel (example static value)
+  text("Fuel: 100%", x, y + spacing * 2);
+
+  // Coin (example static value)
+  text("Coins: 0", x, y + spacing * 3);
+
+  // Diamond (example static value)
+  text("Diamonds: 0", x, y + spacing * 4);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function drawBrain() { //show the brain of whatever genome is currently showing

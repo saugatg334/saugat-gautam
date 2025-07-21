@@ -1,38 +1,42 @@
+
 class Player {
 
   constructor() {
-    this.fitness;
-    this.vision = []; //the input array fed into the neuralNet
-    this.decision = []; //the out put of the NN
-    this.unadjustedFitness;
-    this.lifespan = 0; //how long the player lived for this.fitness
-    this.bestScore = 0; //stores the this.score achieved used for replay
-    this.dead;
+    this.fitness = 0;
+    this.vision = [];
+    this.decision = [];
+    this.unadjustedFitness = 0;
+    this.lifespan = 0;
+    this.bestScore = 0;
+    this.dead = false;
     this.score = 0;
     this.gen = 0;
-
     this.genomeInputs = 13;
     this.genomeOutputs = 4;
-    this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
+    if (typeof Genome !== 'undefined') {
+      this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
+    } else {
+      this.brain = null;
+      console.warn('Genome class is not defined.');
+    }
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-    }
+    // Implement rendering logic here if needed
+  }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move() {
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-    }
+    // Implement movement logic here if needed
+  }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   update() {
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-    }
+    // Implement update logic here if needed
+  }
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
   look() {
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-
+    // Implement vision logic here if needed
   }
 
 
@@ -40,30 +44,30 @@ class Player {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //gets the output of the this.brain then converts them to actions
   think() {
-
-      var max = 0;
-      var maxIndex = 0;
-      //get the output of the neural network
+    let max = 0;
+    let maxIndex = 0;
+    if (this.brain && typeof this.brain.feedForward === 'function') {
       this.decision = this.brain.feedForward(this.vision);
-
-      for(var i = 0; i < this.decision.length; i++) {
-        if(this.decision[i] > max) {
-          max = this.decision[i];
-          maxIndex = i;
-        }
-      }
-
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-
-
+    } else {
+      this.decision = [];
     }
+    for (let i = 0; i < this.decision.length; i++) {
+      if (this.decision[i] > max) {
+        max = this.decision[i];
+        maxIndex = i;
+      }
+    }
+    // Implement action logic based on decision here if needed
+  }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
     //returns a clone of this player with the same brian
   clone() {
-    var clone = new Player();
-    clone.brain = this.brain.clone();
+    const clone = new Player();
+    if (this.brain && typeof this.brain.clone === 'function') {
+      clone.brain = this.brain.clone();
+      clone.brain.generateNetwork && clone.brain.generateNetwork();
+    }
     clone.fitness = this.fitness;
-    clone.brain.generateNetwork();
     clone.gen = this.gen;
     clone.bestScore = this.score;
     return clone;
@@ -74,28 +78,32 @@ class Player {
   //this fuction does that
 
   cloneForReplay() {
-    var clone = new Player();
-    clone.brain = this.brain.clone();
+    const clone = new Player();
+    if (this.brain && typeof this.brain.clone === 'function') {
+      clone.brain = this.brain.clone();
+      clone.brain.generateNetwork && clone.brain.generateNetwork();
+    }
     clone.fitness = this.fitness;
-    clone.brain.generateNetwork();
     clone.gen = this.gen;
     clone.bestScore = this.score;
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
     return clone;
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //fot Genetic algorithm
   calculateFitness() {
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-
+    // Implement fitness calculation logic here if needed
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   crossover(parent2) {
-    var child = new Player();
-    child.brain = this.brain.crossover(parent2.brain);
-    child.brain.generateNetwork();
+    const child = new Player();
+    if (this.brain && typeof this.brain.crossover === 'function' && parent2.brain) {
+      child.brain = this.brain.crossover(parent2.brain);
+      child.brain.generateNetwork && child.brain.generateNetwork();
+    }
     return child;
   }
+// Export for use in other modules (ES6)
+export default Player;
 }
