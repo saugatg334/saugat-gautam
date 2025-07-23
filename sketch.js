@@ -47,7 +47,10 @@ let panY = 0;
 let leftDown = false;
 let rightDown = false;
 const listener = new Box2D.Dynamics.b2ContactListener();
-// let listener2 = new Box2D.Dynamics.b2ContactListener();
+
+// Game State and Power-up Systems
+let gameState;
+let powerUpManager;
 
 let carSprite;
 let headSprite;
