@@ -470,41 +470,95 @@ function drawToScreen() {
 }
 
 function drawHUD() {
+  if (!gameState) return;
+  
   fill(255);
   stroke(0);
   strokeWeight(2);
-  textSize(20);
+  textSize(18);
   textAlign(LEFT, TOP);
 
-  // Example positions
+  // HUD positions
   let x = 20;
   let y = 20;
-  let spacing = 30;
+  let spacing = 28;
 
   // Draw background box for HUD
-  fill(0, 150);
+  fill(0, 180);
   noStroke();
-  rect(x - 10, y - 10, 220, spacing * 5 + 20, 10);
+  rect(x - 15, y - 15, 280, spacing * 7 + 25, 12);
 
   // Draw text with stroke for readability
-  stroke(0);
-  strokeWeight(2);
+  stroke(2);
+  strokeWeight(3);
   fill(255);
+  textSize(16);
 
   // Vehicle info
-  text("Vehicle: " + (selectedVehicle || "Unknown"), x, y);
+  const currentVehicle = VEHICLE_LIST ? VEHICLE_LIST[gameState.selectedVehicle] : null;
+  const vehicleName = currentVehicle ? translate(currentVehicle.name.toLowerCase().replace(/ /g, '')) || currentVehicle.name : "Unknown";
+  text(translate('selectVehicle') + ": " + vehicleName, x, y);
 
   // Stage info
-  text("Stage: " + (selectedStage || "Unknown"), x, y + spacing);
+  const currentStage = STAGE_LIST ? STAGE_LIST[gameState.selectedStage] : null;
+  const stageName = currentStage ? translate(currentStage.name.toLowerCase().replace(/ /g, '')) || currentStage.name : "Unknown";
+  text(translate('selectStage') + ": " + stageName, x, y + spacing);
 
-  // Fuel (example static value)
-  text("Fuel: 100%", x, y + spacing * 2);
+  // Fuel bar
+  text(translate('fuel') + ":", x, y + spacing * 2);
+  drawProgressBar(x + 60, y + spacing * 2 + 2, 120, 14, gameState.fuel, gameState.maxFuel, color(255, 100, 100), color(100, 255, 100));
 
-  // Coin (example static value)
-  text("Coins: 0", x, y + spacing * 3);
+  // Coins
+  fill(255, 215, 0);
+  text("🪙 " + translate('coins') + ": " + gameState.coins, x, y + spacing * 3);
 
-  // Diamond (example static value)
-  text("Diamonds: 0", x, y + spacing * 4);
+  // Diamonds  
+  fill(0, 255, 255);
+  text("💎 " + translate('diamonds') + ": " + gameState.diamonds, x, y + spacing * 4);
+
+  // Active power-ups
+  let powerUpY = y + spacing * 5;
+  if (gameState.isPowerUpActive('nitro')) {
+    fill(255, 69, 0);
+    const timeLeft = Math.ceil(gameState.getPowerUpTimeLeft('nitro') / 1000);
+    text("🔥 " + translate('nitroBoost') + " " + timeLeft + "s", x, powerUpY);
+    powerUpY += 20;
+  }
+  if (gameState.isPowerUpActive('shield')) {
+    fill(65, 105, 225);
+    const timeLeft = Math.ceil(gameState.getPowerUpTimeLeft('shield') / 1000);
+    text("🛡️ " + translate('shieldActive') + " " + timeLeft + "s", x, powerUpY);
+    powerUpY += 20;
+  }
+  if (gameState.isPowerUpActive('magnet')) {
+    fill(255, 20, 147);
+    const timeLeft = Math.ceil(gameState.getPowerUpTimeLeft('magnet') / 1000);
+    text("🧲 " + translate('magnetActive') + " " + timeLeft + "s", x, powerUpY);
+    powerUpY += 20;
+  }
+
+  // Distance and score (for human player)
+  if (humanPlaying && humanPlayer) {
+    fill(255);
+    text(translate('score') + ": " + humanPlayer.score, x, powerUpY);
+    text(translate('distance') + ": " + Math.floor(humanPlayer.car ? humanPlayer.car.maxDistance : 0), x, powerUpY + 20);
+  }
+}
+
+function drawProgressBar(x, y, width, height, current, max, emptyColor, fullColor) {
+  // Background
+  fill(emptyColor);
+  stroke(0);
+  strokeWeight(1);
+  rect(x, y, width, height, 3);
+  
+  // Fill
+  if (current > 0) {
+    fill(fullColor);
+    noStroke();
+    const fillWidth = (current / max) * width;
+    rect(x + 1, y + 1, fillWidth - 2, height - 2, 2);
+  }
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function drawBrain() { //show the brain of whatever genome is currently showing
