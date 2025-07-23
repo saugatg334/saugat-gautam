@@ -308,6 +308,9 @@ function draw() {
       genPlayerTemp.think();
       genPlayerTemp.update();
       genPlayerTemp.show();
+      
+      // Update power-ups
+      if (powerUpManager) powerUpManager.update(gameState, genPlayerTemp);
     } else { //if dead move on to the next generation
       upToGen++;
       if (upToGen >= population.genPlayers.length) { //if at the end then return to the start and stop doing it
@@ -326,9 +329,34 @@ function draw() {
       humanPlayer.update();
       humanPlayer.show();
       humanPlayer.look();
+      
+      // Update fuel consumption for human player
+      if (gameState && humanPlayer.car) {
+        const distance = humanPlayer.car.maxDistance - 349;
+        const vehicleData = VEHICLE_LIST ? VEHICLE_LIST[gameState.selectedVehicle] : null;
+        const fuelEfficiency = vehicleData ? vehicleData.fuelEfficiency : 7;
+        
+        if (distance > 0) {
+          gameState.consumeFuel(distance / 100, fuelEfficiency);
+          
+          // End game if out of fuel
+          if (gameState.fuel <= 0) {
+            humanPlayer.dead = true;
+          }
+        }
+      }
+
+      // Update power-ups
+      if (powerUpManager) powerUpManager.update(gameState, humanPlayer);
 
     } else { //once done return to ai
       humanPlaying = false;
+      
+      // Complete game and award rewards
+      if (gameState && humanPlayer) {
+        const rewards = gameState.completeGame(humanPlayer.score, humanPlayer.car ? humanPlayer.car.maxDistance : 0);
+        console.log(`Game completed! Coins earned: ${rewards.coins}, Diamonds earned: ${rewards.diamonds}`);
+      }
     }
   } else
   if (runBest) { // if replaying the best ever game
@@ -339,6 +367,9 @@ function draw() {
       population.bestPlayer.think();
       population.bestPlayer.update();
       population.bestPlayer.show();
+      
+      // Update power-ups
+      if (powerUpManager) powerUpManager.update(gameState, population.bestPlayer);
     } else { //once dead
       runBest = false; //stop replaying it
       population.bestPlayer = population.bestPlayer.cloneForReplay(); //reset the best player so it can play again
@@ -352,6 +383,9 @@ function draw() {
       population.bestPlayer.think();
       population.bestPlayer.update();
       population.bestPlayer.show();
+      
+      // Update power-ups
+      if (powerUpManager) powerUpManager.update(gameState, humanPlayer);
     } else {
       fightMode = false;
       population.bestPlayer = population.bestPlayer.cloneForReplay();
@@ -363,6 +397,9 @@ function draw() {
       // }
       population.stepWorldsInBatch();
       population.updateAlive();
+      
+      // Update power-ups for AI mode
+      if (powerUpManager) powerUpManager.update(gameState, currentBestPlayer);
     } else { //all dead
       //genetic algorithm
       // grounds[0].show()
@@ -371,6 +408,9 @@ function draw() {
       panX = 0;
       nextPanX = 0;
       targetX = 0;
+      
+      // Reset power-up manager for new generation
+      if (powerUpManager) powerUpManager.reset();
     }
   }
 
@@ -393,6 +433,12 @@ function draw() {
   if (!shownGround) {
     grounds[0].show();
   }
+  
+  // Show power-ups
+  if (powerUpManager) {
+    powerUpManager.show();
+  }
+  
   if (panX < 0) {
     image(darknessSprite, -panX, 400);
 
