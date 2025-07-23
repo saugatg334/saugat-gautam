@@ -251,7 +251,9 @@ function setup() {
   canvas.parent("game-container");
   frameRate(30); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<FRAME RATE
 
-
+  // Initialize game state and power-up systems
+  gameState = new GameState();
+  
   groundTemplate = new Ground();
   groundTemplate.randomizeGround();
 
@@ -259,7 +261,6 @@ function setup() {
     groundTemplate = new Ground();
     groundTemplate.randomizeGround();
   }
-
 
   for (var i = 0; i < numberOfWorlds; i++) {
     let tempWorld = new b2World(new Vec2(0, 10), true);
@@ -280,16 +281,12 @@ function setup() {
   tempGround.setBodies(otherWorld);
   otherWorld.SetContactListener(listener);
 
-  //
-  // ground = new Ground(world);
-  // ground.cloneFrom(groundTemplate);
-  // ground.setBodies(world); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-  // world.SetContactListener(listener);
+  // Initialize power-up manager for the first world
+  powerUpManager = new PowerUpManager(worlds[0]);
 
   population = new Population();
   humanPlayer = new Player(true);
   currentBestPlayer = population.players[0];
-
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
